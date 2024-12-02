@@ -59,7 +59,6 @@ def chat():
         response = requests.post(url, json=payload, headers=headers)
 
         # TO DO: Delete this later. For testing only.
-        print(f"API Key: {api_key}")  # REMOVE this line after verifying
         print(f"Response Status Code: {response.status_code}")
         print(f"Response Content: {response.text}")
 
