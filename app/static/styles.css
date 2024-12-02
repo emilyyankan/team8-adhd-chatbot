@@ -75,3 +75,81 @@
     background-color: #e5e5e5;
     color: #333;
 }
+
+.survey-container {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #f1f1f1;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    width: 250px;
+}
+
+.survey-container h3 {
+    margin-bottom: 10px;
+}
+
+.survey-container label {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 14px;
+}
+
+.survey-container select {
+    width: 100%;
+    margin-bottom: 10px;
+    padding: 5px;
+}
+
+.survey-container button {
+    width: 100%;
+    background-color: #4a90e2;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.survey-container button:hover {
+    background-color: #357abd;
+}
+
+.admin-container {
+    max-width: 800px;
+    margin: 50px auto;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.chart-container {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.canvas {
+    max-width: 100%;
+    height: auto;
+}
+
+.wordcloud-container {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.wordcloud {
+    max-width: 100%;
+    height: auto;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+
+

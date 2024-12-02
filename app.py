@@ -3,6 +3,9 @@ from flask_cors import CORS
 import os
 import requests
 from dotenv import load_dotenv
+import json
+import pandas as pd
+from wordcloud import WordCloud
 
 # Load environment variables from .env file
 load_dotenv()
@@ -10,10 +13,14 @@ load_dotenv()
 app = Flask(__name__, static_folder='app/static')
 CORS(app)
 
+survey_data_path = 'survey_data.json'
+
+responses_log_path = 'responses.log'
+
 api_key = os.getenv("API_KEY")
 
 if not api_key:
-    raise ValueError("API_KEY is not set. Please ensure it is defined in the .env file.")
+    raise ValueError("API_KEY is not set. Please ensure it is defined in the .env file.")    
 
 # Define root route to chatbot main page, index.html
 @app.route('/')
@@ -70,10 +77,77 @@ def chat():
         citations = response_data.get('citations', [])
         if citations:
             assistant_response += "\n\nSources:\n" + "\n".join(citations)
+            
+        with open(responses_log_path, 'a') as log_file:
+            log_file.write(assistant_response + '\n')
 
         return jsonify({"response": assistant_response})
     except Exception as e:
         return jsonify({"response": "I'm having trouble processing your request right now."})
+    
+@app.route('/survey', methods=['POST'])
+def survey():
+    survey_data = request.json
+    try:
+        # Append survey data to the JSON file
+        with open(survey_data_path, 'a') as file:
+            file.write(json.dumps(survey_data) + '\n')
+        return jsonify({"message": "Survey submitted successfully!"})
+    except Exception as e:
+        return jsonify({"error": "Failed to save survey data."})
+  
+
+@app.route('/admin')
+def admin_page():
+    return send_from_directory(app.static_folder, 'admin.html')
+
+@app.route('/survey-results', methods=['GET'])
+def survey_results():
+    try:
+        # Read survey data from the file
+        survey_data = []
+        if os.path.exists(survey_data_path):
+            with open(survey_data_path, 'r') as file:
+                for line in file:
+                    survey_data.append(json.loads(line.strip()))
+
+        # Create a DataFrame from the survey data
+        df = pd.DataFrame(survey_data)
+        if df.empty:
+            return jsonify({"error": "No survey data available."})
+
+        # Count responses for each question
+        q1_counts = df['q1'].value_counts().to_dict()
+        q2_counts = df['q2'].value_counts().to_dict()
+        q3_counts = df['q3'].value_counts().to_dict()
+
+        # Return survey counts as JSON
+        return jsonify({"q1_counts": q1_counts, "q2_counts": q2_counts, "q3_counts": q3_counts})
+    except Exception as e:
+        print(f"Error generating survey results: {e}")
+        return jsonify({"error": "Failed to generate survey data."})
+
+@app.route('/generate-wordcloud', methods=['GET'])
+def generate_wordcloud():
+    try:
+        # Read responses from log file
+        if not os.path.exists(responses_log_path):
+            return jsonify({"error": "No responses log found."})
+
+        with open(responses_log_path, 'r') as file:
+            text = file.read()
+
+        # Generate word cloud
+        wordcloud = WordCloud(width=800, height=400, background_color='white').generate(text)
+        wordcloud_path = os.path.join(app.static_folder, 'wordcloud.png')
+        wordcloud.to_file(wordcloud_path)
+
+        # Return path to word cloud image
+        return jsonify({"wordcloud_url": "/static/wordcloud.png"})
+
+    except Exception as e:
+        return jsonify({"error": "Failed to generate word cloud.", "details": str(e)})
+ 
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)

@@ -21,6 +21,37 @@
     </div>
 </div>
 
+<div class="survey-container">
+    <h3>Feedback Survey</h3>
+    <form id="survey-form">
+        <label for="q1">How satisfied are you with your answers?</label>
+        <select id="q1" name="q1">
+            <option value="Very satisfied">Very satisfied</option>
+            <option value="Somewhat satisfied">Somewhat satisfied</option>
+            <option value="Neutral">Neutral</option>
+            <option value="Somewhat dissatisfied">Somewhat dissatisfied</option>
+            <option value="Very dissatisfied">Very dissatisfied</option>
+        </select>
+
+        <label for="q2">How helpful was the advice?</label>
+        <select id="q2" name="q2">
+            <option value="Very helpful">Very helpful</option>
+            <option value="Somewhat helpful">Somewhat helpful</option>
+            <option value="Neutral">Neutral</option>
+            <option value="Not very helpful">Not very helpful</option>
+            <option value="Not helpful at all">Not helpful at all</option>
+        </select>
+
+        <label for="q3">Would you recommend this chatbot to others?</label>
+        <select id="q3" name="q3">
+            <option value="Yes">Yes</option>
+            <option value="No">No</option>
+        </select>
+
+        <button type="button" onclick="submitSurvey()">Submit</button>
+    </form>
+</div>
+
 <script src="script.js"></script>
 </body>
 </html>
