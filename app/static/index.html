@@ -3,23 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ADHD Management Chatbot</title>
+    <title>ADHD Advisor</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
-<div class="chat-container">
-    <div class="chat-header">
-        <h2>ADHD Management Chatbot</h2>
+    <div class="page-container">
+        <div class="image-container">
+            <img src="/static/chatbot.png" alt="ADHD Support" />
+        </div>
+        <div class="chat-container">
+            <div class="chat-header">
+                <h2>ADHD Advisor</h2>
+            </div>
+            <div id="chat-box" class="chat-box">
+                <div class="message bot-message">
+                    Welcome to ADHD Advisor. This chatbot is designed to provide support for ADHD by offering tips, strategies, and resources to help manage daily challenges, improve focus, and promote overall well-being. Disclaimer: This chatbot is for informational purposes only and does not provide medical or professional advice. Please consult a healthcare professional for medical concerns. 
+                </div>
+            </div>
+            <div class="chat-input">
+                <input type="text" id="user-input" placeholder="Type a message..." autofocus>
+                <button onclick="sendMessage()">Send</button>
+            </div>
+        </div>
     </div>
-    <div id="chat-box" class="chat-box">
-        <!-- Messages will appear here -->
-    </div>
-    <div class="chat-input">
-        <input type="text" id="user-input" placeholder="Type a message..." autofocus>
-        <button onclick="sendMessage()">Send</button>
-    </div>
-</div>
+    
 
 <div class="survey-container">
     <h3>Feedback Survey</h3>
