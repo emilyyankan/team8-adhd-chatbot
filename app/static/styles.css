@@ -194,3 +194,17 @@ body {
     background-color: #357abd;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
+
+.admin-container {
+    max-width: 900px;
+    margin: 50px auto;
+    padding: 20px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+}
+
+#charts-container canvas {
+    max-width: 100%;
+    height: auto;
+}

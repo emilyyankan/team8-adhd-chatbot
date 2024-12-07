@@ -70,8 +70,81 @@ async function loadSurveyCharts() {
     }
 }
 
-// Load charts
+// Load survey charts
 loadSurveyCharts();
+
+
+async function loadResponseTimeChart() {
+    try {
+        const response = await fetch('/response-times');
+        if (!response.ok) throw new Error('Failed to fetch response times.');
+
+        const data = await response.json();
+        if (data.error) {
+            alert(data.error);
+            return;
+        }
+
+        const times = data.times;
+        const avg = data.average_time;
+
+        // Prepare data for a scatter chart. Each data point must have x and y values.
+        const scatterData = times.map((time, index) => ({ x: index + 1, y: time }));
+
+        const ctx = document.getElementById('response-time-chart').getContext('2d');
+        new Chart(ctx, {
+            type: 'scatter',
+            data: {
+                datasets: [
+                    {
+                        label: 'Response Time (s)',
+                        data: scatterData,
+                        backgroundColor: 'rgba(75, 192, 192, 0.6)',
+
+                        // By default, scatter draws points. No need for "fill" or "borderColor" unless you want them.
+                    },
+                ],
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: `Average Response Time: ${avg.toFixed(2)} seconds`
+                    },
+                    legend: {
+                        display: true,
+                        position: 'top',
+                    },
+                },
+                scales: {
+                    x: {
+                        type: 'linear',
+                        position: 'bottom',
+                        title: {
+                            display: true,
+                            text: 'Response #'
+                        },
+                        beginAtZero: true,
+                    },
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Time (s)'
+                        },
+                    },
+                },
+            },
+        });
+    } catch (error) {
+        console.error('Error loading response time chart:', error);
+    }
+}
+
+// Load the response time chart
+loadResponseTimeChart();
+
 
 async function loadWordCloud() {
     try {

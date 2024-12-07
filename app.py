@@ -6,6 +6,8 @@ from dotenv import load_dotenv
 import json
 import pandas as pd
 from wordcloud import WordCloud
+import time
+import statistics
 
 # Load environment variables from .env file
 load_dotenv()
@@ -16,6 +18,8 @@ CORS(app)
 survey_data_path = 'survey_data.json'
 
 responses_log_path = 'responses.log'
+
+response_time_data_path = 'response_time_data.json'
 
 api_key = os.getenv("API_KEY")
 
@@ -36,7 +40,9 @@ def chat():
     user_message = request.json.get('message')
     if not user_message:
         return jsonify({"response": "I didn't catch that. Could you please repeat?"})
-
+    
+    start_time = time.time()  # Start timing
+    
     try:
         # Use Perplexity API to get a response
         url = "https://api.perplexity.ai/chat/completions"
@@ -73,6 +79,14 @@ def chat():
 
         # Extract the response content
         assistant_response = response_data.get('choices', [{}])[0].get('message', {}).get('content', "I'm not sure how to answer that.")
+        
+        # End timing
+        end_time = time.time()
+        response_time = end_time - start_time
+
+        # Track response time
+        with open(response_time_data_path, 'a') as rt_file:
+            rt_file.write(json.dumps({"time": response_time}) + '\n')
 
         citations = response_data.get('citations', [])
         if citations:
@@ -147,8 +161,36 @@ def generate_wordcloud():
 
     except Exception as e:
         return jsonify({"error": "Failed to generate word cloud.", "details": str(e)})
+    
+@app.route('/response-times', methods=['GET'])
+def response_times():
+    try:
+        response_times = []
+        if os.path.exists(response_time_data_path):
+            with open(response_time_data_path, 'r') as file:
+                for line in file:
+                    data = json.loads(line.strip())
+                    if "time" in data:
+                        response_times.append(data["time"])
+
+        if not response_times:
+            return jsonify({"error": "No response time data available."})
+
+        # You might want to compute average, or show all data
+        avg_time = statistics.mean(response_times)
+
+        # Return data needed for chart
+        # For demonstration, let's just return all times and the average
+        return jsonify({
+            "times": response_times, 
+            "average_time": avg_time
+        })
+
+    except Exception as e:
+        print(f"Error generating response times data: {e}")
+        return jsonify({"error": "Failed to generate response times data."})    
  
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
-
+    
