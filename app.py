@@ -81,7 +81,7 @@ def chat():
         response_data = response.json()
 
         # Extract the response content
-        assistant_response = response_data.get('choices', [{}])[0].get('message', {}).get('content', "I'm not sure how to answer that.")
+        assistant_response = (str)(response_data.get('choices', [{}])[0].get('message', {}).get('content', "I'm not sure how to answer that."))
         
         # End timing
         end_time = time.time()
@@ -90,10 +90,11 @@ def chat():
         # Track response time
         with open(response_time_data_path, 'a') as rt_file:
             rt_file.write(json.dumps({"time": response_time}) + '\n')
-
-        citations = response_data.get('citations', [])
-        if citations:
-            assistant_response += "\n\nSources:\n" + "\n".join(citations)
+        
+        if assistant_response.find("not qualified") < 0:
+            citations = response_data.get('citations', [])
+            if citations:
+                assistant_response += "\n\nSources:\n" + "\n".join(citations)
             
         with open(responses_log_path, 'a') as log_file:
             log_file.write(assistant_response + '\n')
