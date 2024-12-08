@@ -91,13 +91,13 @@ def chat():
         with open(response_time_data_path, 'a') as rt_file:
             rt_file.write(json.dumps({"time": response_time}) + '\n')
         
+        with open(responses_log_path, 'a') as log_file:
+            log_file.write(assistant_response + '\n')
+        
         if assistant_response.find("not qualified") < 0:
             citations = response_data.get('citations', [])
             if citations:
                 assistant_response += "\n\nSources:\n" + "\n".join(citations)
-            
-        with open(responses_log_path, 'a') as log_file:
-            log_file.write(assistant_response + '\n')
 
         return jsonify({"response": assistant_response})
     except Exception as e:
