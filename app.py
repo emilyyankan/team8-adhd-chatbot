@@ -61,7 +61,7 @@ def chat():
                     "content": query
                     }
             ],
-            "max_tokens": 100,
+            "max_tokens": 1000,
             "temperature": 0.7,
             "top_p": 0.9,
             "return_images": False,
