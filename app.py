@@ -8,6 +8,7 @@ import pandas as pd
 from wordcloud import WordCloud
 import time
 import statistics
+import re
 
 # Load environment variables from .env file
 load_dotenv()
@@ -16,9 +17,7 @@ app = Flask(__name__, static_folder='app/static')
 CORS(app)
 
 survey_data_path = 'survey_data.json'
-
 responses_log_path = 'responses.log'
-
 response_time_data_path = 'response_time_data.json'
 
 api_key = os.getenv("API_KEY")
@@ -59,7 +58,7 @@ def chat():
                 {
                     "role": "user", 
                     "content": query
-                    }
+                }
             ],
             "max_tokens": 1000,
             "temperature": 0.7,
@@ -74,14 +73,21 @@ def chat():
 
         response = requests.post(url, json=payload, headers=headers)
 
-        # TO DO: Delete this later. For testing only.
         print(f"Response Status Code: {response.status_code}")
         print(f"Response Content: {response.text}")
 
         response_data = response.json()
 
         # Extract the response content
-        assistant_response = (str)(response_data.get('choices', [{}])[0].get('message', {}).get('content', "I'm not sure how to answer that."))
+        assistant_response = response_data.get('choices', [{}])[0].get('message', {}).get('content', "I'm not sure how to answer that.")
+        assistant_response = clean_response(assistant_response)
+        
+        # Handle citations
+        citations = response_data.get('citations', [])
+        if citations:
+            citation_map = {f"[{i+1}]": f"{citations[i]}" for i in range(len(citations))}
+            assistant_response = append_citations(assistant_response, citation_map)
+            assistant_response += "\n\nSources:\n" + "\n".join([f"[{i+1}] {citations[i]}" for i in range(len(citations))])
         
         # End timing
         end_time = time.time()
@@ -93,16 +99,12 @@ def chat():
         
         with open(responses_log_path, 'a') as log_file:
             log_file.write(assistant_response + '\n')
-        
-        if assistant_response.find("not qualified") < 0:
-            citations = response_data.get('citations', [])
-            if citations:
-                assistant_response += "\n\nSources:\n" + "\n".join(citations)
 
         return jsonify({"response": assistant_response})
     except Exception as e:
-        return jsonify({"response": "I'm having trouble processing your request right now."})
-    
+        print(f"Error during API call: {e}")
+        return jsonify({"response": "I'm having trouble processing your request right now. Please try again later."})
+
 @app.route('/survey', methods=['POST'])
 def survey():
     survey_data = request.json
@@ -113,7 +115,7 @@ def survey():
         return jsonify({"message": "Survey submitted successfully!"})
     except Exception as e:
         return jsonify({"error": "Failed to save survey data."})
-  
+
 
 @app.route('/admin')
 def admin_page():
@@ -180,11 +182,9 @@ def response_times():
         if not response_times:
             return jsonify({"error": "No response time data available."})
 
-        # You might want to compute average, or show all data
+        # Compute average response time
         avg_time = statistics.mean(response_times)
 
-        # Return data needed for chart
-        # For demonstration, let's just return all times and the average
         return jsonify({
             "times": response_times, 
             "average_time": avg_time
@@ -195,6 +195,20 @@ def response_times():
         return jsonify({"error": "Failed to generate response times data."})    
  
 
+def clean_response(response):
+    # Remove markdown headers (###, ##, #)
+    response = re.sub(r"^#+\s", "", response, flags=re.MULTILINE)
+    # Remove bold/italic syntax (** or *)
+    response = re.sub(r"(\*\*|__)(.*?)\1", r"\2", response)
+    response = re.sub(r"(\*|_)(.*?)\1", r"\2", response)
+    # Remove list markers (-, *)
+    response = re.sub(r"^[-*]\s+", "", response, flags=re.MULTILINE)
+    return response.strip()
+
+def append_citations(response, citation_map):
+    for citation_key, citation_value in citation_map.items():
+        response = response.replace(citation_key, citation_value)
+    return response
+
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
-    
