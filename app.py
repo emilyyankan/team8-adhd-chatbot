@@ -85,7 +85,7 @@ def chat():
         # Handle citations
         citations = response_data.get('citations', [])
         if citations:
-            citation_map = {f"[{i+1}]": f"{citations[i]}" for i in range(len(citations))}
+            citation_map = {f"[{i+1}]": f"{[i+1]}" for i in range(len(citations))}
             assistant_response = append_citations(assistant_response, citation_map)
             assistant_response += "\n\nSources:\n" + "\n".join([f"[{i+1}] {citations[i]}" for i in range(len(citations))])
         
