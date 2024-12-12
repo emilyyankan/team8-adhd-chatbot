@@ -50,6 +50,7 @@ function stripMarkup(text) {
     return div.textContent || div.innerText || "";
 }
 
+
 async function submitSurvey() {
     const form = document.getElementById('survey-form');
     const surveyData = {

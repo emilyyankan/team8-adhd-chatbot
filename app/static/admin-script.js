@@ -1,3 +1,5 @@
+
+// A function to load the survey charts
 async function loadSurveyCharts() {
     try {
         const response = await fetch('/survey-results');
@@ -10,9 +12,9 @@ async function loadSurveyCharts() {
         }
 
         const container = document.getElementById('charts-container');
-        container.innerHTML = ''; // Clear existing charts if any
+        container.innerHTML = ''; // Clear existing charts
 
-        // Chart data for each question
+        // Questions for the charts and data variables
         const questions = [
             { label: 'How satisfied are you with your answers?', data: data.q1_counts, color: 'rgba(75, 192, 192, 0.6)' },
             { label: 'How helpful was the advice?', data: data.q2_counts, color: 'rgba(192, 75, 192, 0.6)' },
@@ -20,7 +22,7 @@ async function loadSurveyCharts() {
         ];
 
         questions.forEach((question, index) => {
-            // Create a new canvas element for each chart
+            // Create a canvas element for each chart
             const chartWrapper = document.createElement('div');
             chartWrapper.style.marginBottom = '20px';
             const canvas = document.createElement('canvas');
@@ -70,10 +72,7 @@ async function loadSurveyCharts() {
     }
 }
 
-// Load survey charts
-loadSurveyCharts();
-
-
+// A function to load the response time chart
 async function loadResponseTimeChart() {
     try {
         const response = await fetch('/response-times');
@@ -88,7 +87,7 @@ async function loadResponseTimeChart() {
         const times = data.times;
         const avg = data.average_time;
 
-        // Prepare data for a scatter chart. Each data point must have x and y values.
+        // Prepare data for a scatter plot. Each data point must have x and y values.
         const scatterData = times.map((time, index) => ({ x: index + 1, y: time }));
 
         const ctx = document.getElementById('response-time-chart').getContext('2d');
@@ -97,11 +96,10 @@ async function loadResponseTimeChart() {
             data: {
                 datasets: [
                     {
-                        label: 'Response Time (s)',
+                        label: 'Response Time',
                         data: scatterData,
                         backgroundColor: 'rgba(75, 192, 192, 0.6)',
 
-                        // By default, scatter draws points. No need for "fill" or "borderColor" unless you want them.
                     },
                 ],
             },
@@ -123,7 +121,7 @@ async function loadResponseTimeChart() {
                         position: 'bottom',
                         title: {
                             display: true,
-                            text: 'Response #'
+                            text: 'Response number'
                         },
                         beginAtZero: true,
                     },
@@ -131,7 +129,7 @@ async function loadResponseTimeChart() {
                         beginAtZero: true,
                         title: {
                             display: true,
-                            text: 'Time (s)'
+                            text: 'Time'
                         },
                     },
                 },
@@ -142,10 +140,7 @@ async function loadResponseTimeChart() {
     }
 }
 
-// Load the response time chart
-loadResponseTimeChart();
-
-
+// A function to load the word cloud
 async function loadWordCloud() {
     try {
         const response = await fetch('/generate-wordcloud');
@@ -164,6 +159,8 @@ async function loadWordCloud() {
     }
 }
 
-// Load word cloud
+// Load all functions
+loadSurveyCharts();
+loadResponseTimeChart();
 loadWordCloud();
 
