@@ -97,6 +97,7 @@ def chat():
         with open(response_time_data_path, 'a') as rt_file:
             rt_file.write(json.dumps({"time": response_time}) + '\n')
         
+        # Save response to file for word cloud
         with open(responses_log_path, 'a') as log_file:
             log_file.write(assistant_response + '\n')
 
@@ -139,7 +140,7 @@ def survey_results():
         if df.empty:
             return jsonify({"error": "No survey data available."})
 
-        # Count responses for each question
+        # Frequency count for each question
         q1_counts = df['q1'].value_counts().to_dict()
         q2_counts = df['q2'].value_counts().to_dict()
         q3_counts = df['q3'].value_counts().to_dict()
