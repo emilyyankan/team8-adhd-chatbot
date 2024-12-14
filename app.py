@@ -124,15 +124,18 @@ def admin_page():
 @app.route('/survey-results', methods=['GET'])
 def survey_results():
     try:
-        # Read survey data from the file
-        survey_data = []
+        # Check if the survey data file exists
         if os.path.exists(survey_data_path):
-            with open(survey_data_path, 'r') as file:
-                for line in file:
-                    survey_data.append(json.loads(line.strip()))
+            try:
+                # Read JSON file into a DataFrame
+                df = pd.read_json(survey_data_path, lines=True)  # Handles JSON Lines format
+            except ValueError as e:
+                print(f"Error reading JSON file: {e}")
+                return jsonify({"error": "Survey data is improperly formatted."})
+        else:
+            return jsonify({"error": "No survey data file found."})
 
-        # Create a DataFrame from the survey data
-        df = pd.DataFrame(survey_data)
+        # Check if the DataFrame is empty
         if df.empty:
             return jsonify({"error": "No survey data available."})
 
@@ -143,9 +146,11 @@ def survey_results():
 
         # Return survey counts as JSON
         return jsonify({"q1_counts": q1_counts, "q2_counts": q2_counts, "q3_counts": q3_counts})
+
     except Exception as e:
         print(f"Error generating survey results: {e}")
         return jsonify({"error": "Failed to generate survey data."})
+
 
 @app.route('/generate-wordcloud', methods=['GET'])
 def generate_wordcloud():
